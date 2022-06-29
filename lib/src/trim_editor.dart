@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/src/thumbnail_viewer.dart';
-import 'package:video_trimmer/src/trim_editor_painter.dart';
 import 'package:video_trimmer/src/trimmer.dart';
 
 import 'trim.cutter.dart';
@@ -90,13 +89,6 @@ class TrimEditor extends StatefulWidget {
   /// Returns the selected video end position in `milliseconds`.
   final Function(double endValue)? onChangeEnd;
 
-  /// Callback to the video playback
-  /// state to know whether it is currently playing or paused.
-  ///
-  /// Returns a `boolean` value. If `true`, video is currently
-  /// playing, otherwise paused.
-  final Function(bool isPlaying)? onChangePlaybackState;
-
   /// Determines the touch size of the side handles, left and right. The rest, in
   /// the center, will move the whole frame if [maxVideoLength] is inferior to the
   /// total duration of the video.
@@ -164,10 +156,6 @@ class TrimEditor extends StatefulWidget {
   ///
   /// * [onChangeEnd] is a callback to the video end position.
   ///
-  ///
-  /// * [onChangePlaybackState] is a callback to the video playback
-  /// state to know whether it is currently playing or paused.
-  ///
   const TrimEditor({
     Key? key,
     required this.trimmer,
@@ -188,7 +176,6 @@ class TrimEditor extends StatefulWidget {
     this.durationTextStyle = const TextStyle(color: Colors.white),
     this.onChangeStart,
     this.onChangeEnd,
-    this.onChangePlaybackState,
   }) : super(key: key);
 
   @override
@@ -315,35 +302,23 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   Future<void> _initializeVideoController() async {
     if (_videoFile != null) {
-      videoPlayerController.addListener(() async {
+      videoPlayerController.addListener(() {
           if(videoPlayerController.value.position == videoPlayerController.value.duration) {
-            await videoPlayerController.pause();
-            await videoPlayerController.seekTo(
-              Duration(milliseconds: _videoStartPos.toInt()),
-            );
-            await videoPlayerController.play();
+            resetVideo();
 
           }
 
         final bool isPlaying = videoPlayerController.value.isPlaying;
 
         if (isPlaying) {
-          widget.onChangePlaybackState!(true);
-          setState(() async {
+          setState(() {
             _currentPosition =
                 videoPlayerController.value.position.inMilliseconds;
 
             if (_currentPosition > _videoEndPos.toInt()) {
-              await videoPlayerController.pause();
-              await videoPlayerController.seekTo(
-                Duration(milliseconds: _videoStartPos.toInt()),
-              );
-              await videoPlayerController.play();
-              //widget.onChangePlaybackState!(false);
-              //_animationController!.stop();
+              resetVideo();
             } else {
               if (!_animationController!.isAnimating) {
-                //widget.onChangePlaybackState!(true);
                 _animationController!.forward();
               }
             }
@@ -491,8 +466,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
       videoPlayerController.setVolume(0.0);
       videoPlayerController.dispose();
     }
-    widget.onChangePlaybackState!(false);
-
     super.dispose();
   }
 
@@ -527,6 +500,14 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  Future<void> resetVideo() async {
+    await videoPlayerController.pause();
+    await videoPlayerController.seekTo(
+      Duration(milliseconds: _videoStartPos.toInt()),
+    );
+    await videoPlayerController.play();
   }
 }
 
