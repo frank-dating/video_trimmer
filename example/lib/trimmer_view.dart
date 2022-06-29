@@ -78,6 +78,9 @@ class _TrimmerViewState extends State<TrimmerView> {
                       scrubberPaintColor: const Color(0xFFA3F3DD),
                       circlePaintColor: const Color(0xFFA3F3DD),
                       borderPaintColor: const Color(0xFFA3F3DD),
+                      previewWrapper: (_) {
+                        return _;
+                      },
                       onChangeStart: (value) {
                         _startValue = value;
                       },

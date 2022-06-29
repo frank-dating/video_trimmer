@@ -94,6 +94,7 @@ class TrimEditor extends StatefulWidget {
   /// total duration of the video.
   final int sideTapSize;
 
+  final Widget Function(Widget) previewWrapper;
   /// Widget for displaying the video trimmer.
   ///
   /// This has frame wise preview of the video with a
@@ -175,7 +176,7 @@ class TrimEditor extends StatefulWidget {
     this.sideTapSize = 24,
     this.durationTextStyle = const TextStyle(color: Colors.white),
     this.onChangeStart,
-    this.onChangeEnd,
+    this.onChangeEnd, required this.previewWrapper,
   }) : super(key: key);
 
   @override
@@ -351,6 +352,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         quality: widget.thumbnailQuality,
         width: _thumbnailViewerW,
         controller: videoPlayerController,
+        previewWrapper: widget.previewWrapper,
       );
       thumbnailWidget = _thumbnailWidget;
     }
@@ -421,6 +423,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         _onEndDragged();
       }
     }
+
     setState(() {});
   }
 
@@ -430,6 +433,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     _startFraction = (_startPos.dx / _thumbnailViewerW);
     _videoStartPos = _videoDuration * _startFraction;
     widget.onChangeStart?.call(_videoStartPos);
+    videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
+
     _linearTween.begin = _startPos.dx;
     _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
@@ -440,6 +445,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     _endFraction = _endPos.dx / _thumbnailViewerW;
     _videoEndPos = _videoDuration * _endFraction;
     widget.onChangeEnd?.call(_videoEndPos);
+    videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
+
     _linearTween.end = _endPos.dx;
     _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
@@ -450,13 +457,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void _onDragEnd(DragEndDetails details) {
     setState(() {
       _circleSize = widget.circleSize;
-      if (_dragType == EditorDragType.right) {
-        videoPlayerController
-            .seekTo(Duration(milliseconds: _videoStartPos.toInt()));
-      } else {
-        videoPlayerController
-            .seekTo(Duration(milliseconds: _videoStartPos.toInt()));
-      }
+      videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
+
       videoPlayerController.play();
     });
   }

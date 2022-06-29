@@ -14,6 +14,8 @@ class ThumbnailViewer extends StatelessWidget {
   final int quality;
   final double width;
   final VideoPlayerController controller;
+  final Widget Function(Widget) previewWrapper;
+
   /// For showing the thumbnails generated from the video,
   /// like a frame by frame preview
   const ThumbnailViewer({
@@ -25,6 +27,7 @@ class ThumbnailViewer extends StatelessWidget {
     required this.thumbnailHeight,
     required this.numberOfThumbnails,
     required this.fit,
+    required this.previewWrapper,
     this.quality = 75,
   }) : super(key: key);
 
@@ -76,24 +79,28 @@ class ThumbnailViewer extends StatelessWidget {
             width: this.width,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               child: Row(
-                children: _imageBytes.map(
-                  (e) => SizedBox(
-                    height: thumbnailHeight,
-                    width: width,
-                    child: Image(
-                      image: MemoryImage(e!),
-                      fit: fit,
-                    ),
-                  ),
-                ).toList(),
+                children: _imageBytes
+                    .map(
+                      (e) => previewWrapper(
+                        SizedBox(
+                          height: thumbnailHeight,
+                          width: width,
+                          child: Image(
+                            image: MemoryImage(e!),
+                            fit: fit,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
           );
         } else {
           return Container(
-            color: Color(0xFFEEEEEE),
+            color: const Color(0xFFEEEEEE),
             height: thumbnailHeight,
             width: double.maxFinite,
           );
