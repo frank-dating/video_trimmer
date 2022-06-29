@@ -19,11 +19,11 @@ class _TrimmerViewState extends State<TrimmerView> {
   double _endValue = 0.0;
 
   bool _isPlaying = false;
-  bool _progressVisibility = false;
 
   @override
   void initState() {
     super.initState();
+
 
     _loadVideo();
   }
@@ -32,30 +32,19 @@ class _TrimmerViewState extends State<TrimmerView> {
     _trimmer.loadVideo(videoFile: widget.file);
   }
 
-  _saveVideo() {
-    setState(() {
-      _progressVisibility = true;
-    });
-
-    _trimmer.saveTrimmedVideo(
-      startValue: _startValue,
-      endValue: _endValue,
-      onSave: (outputPath) {
-        setState(() {
-          _progressVisibility = false;
-        });
-        debugPrint('OUTPUT PATH: $outputPath');
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Preview(outputPath),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // if(_isPlaying) {
+    //   _trimmer.videPlaybackControl(
+    //     startValue: _startValue,
+    //     endValue: _endValue,
+    //   );
+    // } else {
+    //   _trimmer.videPlaybackControl(
+    //     startValue: _startValue,
+    //     endValue: _endValue,
+    //   );
+    // }
     return WillPopScope(
       onWillPop: () async {
         if (Navigator.of(context).userGestureInProgress) {
@@ -65,7 +54,7 @@ class _TrimmerViewState extends State<TrimmerView> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text("Video Trimmer"),
         ),
@@ -77,25 +66,19 @@ class _TrimmerViewState extends State<TrimmerView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
-                  Visibility(
-                    visible: _progressVisibility,
-                    child: const LinearProgressIndicator(
-                      backgroundColor: Colors.red,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _progressVisibility ? null : () => _saveVideo(),
-                    child: const Text("SAVE"),
-                  ),
                   Expanded(
                     child: VideoViewer(trimmer: _trimmer),
                   ),
                   Center(
                     child: TrimEditor(
                       trimmer: _trimmer,
-                      viewerHeight: 50.0,
-                      viewerWidth: MediaQuery.of(context).size.width,
-                      maxVideoLength: const Duration(seconds: 10),
+                      viewerHeight: 46.0,
+                      viewerWidth: MediaQuery.of(context).size.width - 50,
+                      fit: BoxFit.fitWidth,
+                      minVideoLength: const Duration(seconds: 3),
+                      scrubberPaintColor: const Color(0xFFA3F3DD),
+                      circlePaintColor: const Color(0xFFA3F3DD),
+                      borderPaintColor: const Color(0xFFA3F3DD),
                       onChangeStart: (value) {
                         _startValue = value;
                       },
@@ -103,9 +86,10 @@ class _TrimmerViewState extends State<TrimmerView> {
                         _endValue = value;
                       },
                       onChangePlaybackState: (value) {
-                        setState(() {
-                          _isPlaying = value;
-                        });
+                        print('here');
+                       // setState(() {
+                         // _isPlaying = value;
+                       // });
                       },
                     ),
                   ),
@@ -114,12 +98,12 @@ class _TrimmerViewState extends State<TrimmerView> {
                         ? const Icon(
                             Icons.pause,
                             size: 80.0,
-                            color: Colors.white,
+                            color: Colors.black,
                           )
                         : const Icon(
                             Icons.play_arrow,
                             size: 80.0,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                     onPressed: () async {
                       bool playbackState = await _trimmer.videPlaybackControl(

@@ -45,6 +45,8 @@ class Trimmer {
       await _videoPlayerController!.initialize().then((_) {
         _controller.add(TrimmerEvent.initialized);
       });
+
+
     }
   }
 
