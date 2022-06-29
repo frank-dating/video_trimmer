@@ -216,6 +216,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   AnimationController? _animationController;
   late Tween<double> _linearTween;
 
+  bool isVideoResetInProgress = false;
+
   /// Quick access to VideoPlayerController, only not null after [TrimmerEvent.initialized]
   /// has been emitted.
   VideoPlayerController get videoPlayerController =>
@@ -263,7 +265,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
               ? _videoDuration.toDouble() * fraction!
               : _videoDuration.toDouble();
 
-          widget.onChangeEnd!(_videoEndPos);
+          widget.onChangeEnd?.call(_videoEndPos);
 
           _endPos = Offset(
             maxLengthPixels != null ? maxLengthPixels! : _thumbnailViewerW,
@@ -303,10 +305,10 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   Future<void> _initializeVideoController() async {
     if (_videoFile != null) {
       videoPlayerController.addListener(() {
-          if(videoPlayerController.value.position == videoPlayerController.value.duration) {
-            resetVideo();
-
-          }
+        if (videoPlayerController.value.position ==
+                videoPlayerController.value.duration) {
+          resetVideo();
+        }
 
         final bool isPlaying = videoPlayerController.value.isPlaying;
 
@@ -427,7 +429,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
     _startFraction = (_startPos.dx / _thumbnailViewerW);
     _videoStartPos = _videoDuration * _startFraction;
-    widget.onChangeStart!(_videoStartPos);
+    widget.onChangeStart?.call(_videoStartPos);
     _linearTween.begin = _startPos.dx;
     _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
@@ -437,7 +439,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void _onEndDragged() {
     _endFraction = _endPos.dx / _thumbnailViewerW;
     _videoEndPos = _videoDuration * _endFraction;
-    widget.onChangeEnd!(_videoEndPos);
+    widget.onChangeEnd?.call(_videoEndPos);
     _linearTween.end = _endPos.dx;
     _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
@@ -503,11 +505,17 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   }
 
   Future<void> resetVideo() async {
+    if(isVideoResetInProgress) return;
+
+    isVideoResetInProgress = true;
+
     await videoPlayerController.pause();
     await videoPlayerController.seekTo(
       Duration(milliseconds: _videoStartPos.toInt()),
     );
     await videoPlayerController.play();
+
+    isVideoResetInProgress = false;
   }
 }
 
