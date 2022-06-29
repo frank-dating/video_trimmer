@@ -86,7 +86,6 @@ class _TrimmerViewState extends State<TrimmerView> {
                         _endValue = value;
                       },
                       onChangePlaybackState: (value) {
-                        print('here');
                        // setState(() {
                          // _isPlaying = value;
                        // });
