@@ -208,7 +208,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   double? fraction;
   double? maxLengthPixels;
-  Duration maxVideoLength = Duration(seconds: 0);
+  Duration maxVideoLength = const Duration(seconds: 0);
 
   ThumbnailViewer? thumbnailWidget;
 
@@ -284,7 +284,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             })
             ..addStatusListener((status) {
               if (status == AnimationStatus.completed) {
-                _animationController!.stop();
+                _animationController?.stop();
               }
             });
         });
@@ -318,8 +318,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             if (_currentPosition > _videoEndPos.toInt()) {
               resetVideo();
             } else {
-              if (!_animationController!.isAnimating) {
-                _animationController!.forward();
+              if (!(_animationController?.isAnimating ?? true)) {
+                _animationController?.forward();
               }
             }
           });
@@ -328,9 +328,9 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             if (_animationController != null) {
               if ((_scrubberAnimation?.value ?? 0).toInt() ==
                   (_endPos.dx).toInt()) {
-                _animationController!.reset();
+                _animationController?.reset();
               }
-              _animationController!.stop();
+              _animationController?.stop();
               //widget.onChangePlaybackState!(false);
             }
           }
@@ -429,9 +429,9 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     _videoStartPos = _videoDuration * _startFraction;
     widget.onChangeStart!(_videoStartPos);
     _linearTween.begin = _startPos.dx;
-    _animationController!.duration =
+    _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
-    _animationController!.reset();
+    _animationController?.reset();
   }
 
   void _onEndDragged() {
@@ -439,9 +439,9 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     _videoEndPos = _videoDuration * _endFraction;
     widget.onChangeEnd!(_videoEndPos);
     _linearTween.end = _endPos.dx;
-    _animationController!.duration =
+    _animationController?.duration =
         Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
-    _animationController!.reset();
+    _animationController?.reset();
   }
 
   /// Drag gesture ended, update UI accordingly.
@@ -481,10 +481,10 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         child: Stack(
           children: [
             Container(
-              color: Color(0xFF252525),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 17),
+              color: const Color(0xFF252525),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 17),
               child: Container(
-                color: Color(0xFFEEEEEE),
+                color: const Color(0xFFEEEEEE),
                 child: thumbnailWidget ?? Container(),
               ),
             ),
