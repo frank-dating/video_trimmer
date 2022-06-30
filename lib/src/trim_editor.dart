@@ -238,6 +238,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
     widget.trimmer.eventStream.listen((event) {
       if (event == TrimmerEvent.initialized) {
+        if(videoPlayerController.isDisposedOrNotInitialized) return;
+
         //The video has been initialized, now we can load stuff
 
         maxVideoLength = videoPlayerController.value.duration;
@@ -246,6 +248,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             widget.minVideoLength.inSeconds;
 
         _initializeVideoController();
+
         videoPlayerController.seekTo(const Duration(milliseconds: 0));
         setState(() {
           Duration totalDuration = videoPlayerController.value.duration;
@@ -306,6 +309,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   Future<void> _initializeVideoController() async {
     if (_videoFile != null) {
       videoPlayerController.addListener(() {
+        if(videoPlayerController.isDisposedOrNotInitialized) return;
+
         if (videoPlayerController.value.position ==
                 videoPlayerController.value.duration) {
           resetVideo();
@@ -427,6 +432,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   }
 
   void _onStartDragged() {
+    if(videoPlayerController.isDisposedOrNotInitialized) return;
+
     videoPlayerController.pause();
 
     _startFraction = (_startPos.dx / _thumbnailViewerW);
@@ -441,6 +448,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   }
 
   void _onEndDragged() {
+    if(videoPlayerController.isDisposedOrNotInitialized) return;
+
     _endFraction = _endPos.dx / _thumbnailViewerW;
     _videoEndPos = _videoDuration * _endFraction;
     widget.onChangeEnd?.call(_videoEndPos);
@@ -454,6 +463,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   /// Drag gesture ended, update UI accordingly.
   void _onDragEnd(DragEndDetails details) {
+    if(videoPlayerController.isDisposedOrNotInitialized) return;
+
     setState(() {
       _circleSize = widget.circleSize;
       videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
@@ -506,6 +517,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   }
 
   Future<void> resetVideo() async {
+    if(videoPlayerController.isDisposedOrNotInitialized) return;
+
     if(isVideoResetInProgress) return;
 
     isVideoResetInProgress = true;
