@@ -340,7 +340,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         }
       });
 
-      videoPlayerController.setVolume(1.0);
       _videoDuration = videoPlayerController.value.duration.inMilliseconds;
 
       final ThumbnailViewer _thumbnailWidget = ThumbnailViewer(
