@@ -203,8 +203,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   int _numberOfThumbnails = 0;
 
-  late double _circleSize;
-
   double _minCropWidth = 0;
 
   double? fraction;
@@ -213,8 +211,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   ThumbnailViewer? thumbnailWidget;
 
-  Animation<double>? _scrubberAnimation;
-  AnimationController? _animationController;
   late Tween<double> _linearTween;
 
   bool isVideoResetInProgress = false;
@@ -250,6 +246,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         _initializeVideoController();
 
         videoPlayerController.seekTo(const Duration(milliseconds: 0));
+        if(!mounted) return;
         setState(() {
           Duration totalDuration = videoPlayerController.value.duration;
 
@@ -278,26 +275,9 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
           // Defining the tween points
           _linearTween = Tween(begin: _startPos.dx, end: _endPos.dx);
-          _animationController = AnimationController(
-            vsync: this,
-            duration:
-                Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt()),
-          );
-
-          _scrubberAnimation = _linearTween.animate(_animationController!)
-            ..addListener(() {
-              setState(() {});
-            })
-            ..addStatusListener((status) {
-              if (status == AnimationStatus.completed) {
-                _animationController?.stop();
-              }
-            });
         });
       }
     });
-
-    _circleSize = widget.circleSize;
 
     _thumbnailViewerH = widget.viewerHeight;
 
@@ -319,29 +299,15 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
         final bool isPlaying = videoPlayerController.value.isPlaying;
 
         if (isPlaying) {
+          if(!mounted) return;
           setState(() {
             _currentPosition =
                 videoPlayerController.value.position.inMilliseconds;
 
             if (_currentPosition > _videoEndPos.toInt()) {
               resetVideo();
-            } else {
-              if (!(_animationController?.isAnimating ?? true)) {
-                _animationController?.forward();
-              }
             }
           });
-        } else {
-          if (videoPlayerController.value.isInitialized) {
-            if (_animationController != null) {
-              if ((_scrubberAnimation?.value ?? 0).toInt() ==
-                  (_endPos.dx).toInt()) {
-                _animationController?.reset();
-              }
-              _animationController?.stop();
-              //widget.onChangePlaybackState!(false);
-            }
-          }
         }
       });
 
@@ -400,8 +366,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void _onDragUpdate(DragUpdateDetails details) {
     if (!_allowDrag) return;
 
-    _circleSize = widget.circleSizeOnDrag;
-
     if (_dragType == EditorDragType.left) {
       if ((_startPos.dx + details.delta.dx >= 0) &&
           (_startPos.dx + details.delta.dx <= _endPos.dx) &&
@@ -428,6 +392,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
       }
     }
 
+    if(!mounted) return;
     setState(() {});
   }
 
@@ -442,9 +407,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
 
     _linearTween.begin = _startPos.dx;
-    _animationController?.duration =
-        Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
-    _animationController?.reset();
   }
 
   void _onEndDragged() {
@@ -456,17 +418,14 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
 
     _linearTween.end = _endPos.dx;
-    _animationController?.duration =
-        Duration(milliseconds: (_videoEndPos - _videoStartPos).toInt());
-    _animationController?.reset();
   }
 
   /// Drag gesture ended, update UI accordingly.
   void _onDragEnd(DragEndDetails details) {
     if(videoPlayerController.isDisposedOrNotInitialized) return;
 
+    if(!mounted) return;
     setState(() {
-      _circleSize = widget.circleSize;
       videoPlayerController.seekTo(Duration(milliseconds: _videoStartPos.toInt()));
 
       videoPlayerController.play();
@@ -505,7 +464,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             TrimCutter(
               startPos: _startPos,
               endPos: _endPos,
-              scrubberAnimationDx: _scrubberAnimation?.value ?? 0,
               width: _thumbnailViewerW,
               borderPaintColor: widget.borderPaintColor,
               scrubberPaintColor: widget.scrubberPaintColor,

@@ -49,7 +49,6 @@ class TrimCutter extends StatefulWidget {
     Key? key,
     required this.startPos,
     required this.endPos,
-    required this.scrubberAnimationDx,
     this.scrubberPaintColor = Colors.white,
     required this.width, required this.borderPaintColor,
   }) : super(key: key);
@@ -59,9 +58,6 @@ class TrimCutter extends StatefulWidget {
 
   /// To define the end offset
   final Offset endPos;
-
-  /// To define the horizontal length of the selected video area
-  final double scrubberAnimationDx;
 
   final double width;
 
