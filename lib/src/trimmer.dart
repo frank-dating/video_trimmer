@@ -305,6 +305,10 @@ class Trimmer {
 
   /// Clean up
   void dispose() {
+    currentVideoFile = null;
+
+    _videoPlayerController?.pause();
+    _videoPlayerController?.dispose();
     _controller.close();
   }
 }
