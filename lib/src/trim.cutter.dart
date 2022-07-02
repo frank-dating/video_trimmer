@@ -81,18 +81,26 @@ class TrimCutter extends StatefulWidget {
 }
 
 class _TrimCutterState extends State<TrimCutter> {
+  bool isLeftClinged = true;
+  bool isRightClinged = true;
   @override
   Widget build(BuildContext context) {
     var rightPos = widget.width - widget.endPos.dx;
     var leftPos = widget.startPos.dx;
 
-    if (rightPos < 2) {
-      rightPos = 0.0;
-      widget.onClingRight?.call();
-    }
-    if (leftPos < 2) {
+    if (!isLeftClinged && leftPos < 2) {
       leftPos = 0.0;
       widget.onClingLeft?.call();
+    } else {
+      isLeftClinged = false;
+    }
+
+    if (!isRightClinged && rightPos < 2) {
+      rightPos = 0.0;
+      widget.onClingRight?.call();
+      isRightClinged = true;
+    } else {
+      isRightClinged = false;
     }
 
     final isFullWidth = leftPos == 0 && rightPos == 0;
