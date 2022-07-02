@@ -28,7 +28,7 @@ class _TrimmerViewState extends State<TrimmerView> {
   }
 
   void _loadVideo() {
-    _trimmer.loadVideo(videoFile: widget.file);
+    _trimmer.loadVideo(videoFile: widget.file, isVolumeOn: true);
   }
 
   @override

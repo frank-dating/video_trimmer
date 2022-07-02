@@ -50,7 +50,10 @@ class TrimCutter extends StatefulWidget {
     required this.startPos,
     required this.endPos,
     this.scrubberPaintColor = Colors.white,
-    required this.width, required this.borderPaintColor,
+    required this.width,
+    required this.borderPaintColor,
+    required this.onClingLeft,
+    required this.onClingRight,
   }) : super(key: key);
 
   /// To define the start offset
@@ -70,6 +73,9 @@ class TrimCutter extends StatefulWidget {
   /// `Colors.white`.
   final Color scrubberPaintColor;
 
+  final VoidCallback? onClingLeft;
+  final VoidCallback? onClingRight;
+
   @override
   State<TrimCutter> createState() => _TrimCutterState();
 }
@@ -80,9 +86,14 @@ class _TrimCutterState extends State<TrimCutter> {
     var rightPos = widget.width - widget.endPos.dx;
     var leftPos = widget.startPos.dx;
 
-    if(rightPos < 2) rightPos = 0.0;
-    if(leftPos < 2) leftPos = 0.0;
-
+    if (rightPos < 2) {
+      rightPos = 0.0;
+      widget.onClingRight?.call();
+    }
+    if (leftPos < 2) {
+      leftPos = 0.0;
+      widget.onClingLeft?.call();
+    }
 
     final isFullWidth = leftPos == 0 && rightPos == 0;
     return Container(
@@ -99,11 +110,15 @@ class _TrimCutterState extends State<TrimCutter> {
             decoration: BoxDecoration(
               border: Border.symmetric(
                 horizontal: BorderSide(
-                  color: isFullWidth ? const Color(0xFF252525) : widget.borderPaintColor,
+                  color: isFullWidth
+                      ? const Color(0xFF252525)
+                      : widget.borderPaintColor,
                   width: 8,
                 ),
                 vertical: BorderSide(
-                  color: isFullWidth ? const Color(0xFF252525) : widget.borderPaintColor,
+                  color: isFullWidth
+                      ? const Color(0xFF252525)
+                      : widget.borderPaintColor,
                   width: 18,
                 ),
               ),
