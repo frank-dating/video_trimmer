@@ -45,8 +45,11 @@ class Trimmer {
     currentVideoFile = videoFile;
     if (videoFile.existsSync()) {
       _videoPlayerController = VideoPlayerController.file(currentVideoFile!);
-      await _videoPlayerController!.setVolume(isVolumeOn ? 1 : 0);
+      _videoPlayerController!
+        ..setVolume(isVolumeOn ? 1 : 0)
+        ..setLooping(true);
       await _videoPlayerController!.initialize().then((_) {
+        _videoPlayerController!.play();
         _controller.add(TrimmerEvent.initialized);
       });
     }
