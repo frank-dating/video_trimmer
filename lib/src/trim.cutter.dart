@@ -105,8 +105,6 @@ class _TrimCutterState extends State<TrimCutter> {
 
     setClingListeners(leftPos, rightPos);
 
-    print('reight pos: $rightPos : $lastRightPos : ${widget.width}');
-
     lastLeftPos = leftPos;
     lastRightPos = rightPos;
 
