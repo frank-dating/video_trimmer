@@ -388,8 +388,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     } else if (_dragType == EditorDragType.center) {
       if ((_startPos.dx + details.delta.dx >= 0) &&
           (_endPos.dx + details.delta.dx <= _thumbnailViewerW)) {
-        _startPos += details.delta;
-        _endPos += details.delta;
+        _updateBothPos(details);
         _onStartDragged();
         _onEndDragged();
       }
@@ -405,6 +404,29 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
     if (!mounted) return;
     setState(() {});
+  }
+
+  void _updateBothPos(DragUpdateDetails details) {
+    if (_startPos.dx + details.delta.dx < widget.clingOffset) {
+      final gap = _startPos - Offset.zero;
+      _startPos = Offset.zero;
+      _endPos += gap;
+    } else {
+      if (_thumbnailViewerW - (_endPos.dx + details.delta.dx) <
+          widget.clingOffset) {
+        final endPos = Offset(
+          maxLengthPixels != null ? maxLengthPixels! : _thumbnailViewerW,
+          _thumbnailViewerH,
+        );
+
+        final gap = endPos - _endPos;
+        _endPos = endPos;
+        _startPos += gap;
+      } else {
+        _endPos += details.delta;
+        _startPos += details.delta;
+      }
+    }
   }
 
   void _updateStartPos(DragUpdateDetails details) {
