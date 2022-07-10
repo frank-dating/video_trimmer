@@ -455,7 +455,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('last: ${widget.viewerWidth} : $_minCropWidth');
     return GestureDetector(
       onHorizontalDragStart: _onDragStart,
       onHorizontalDragUpdate: _onDragUpdate,
@@ -490,7 +489,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   Future<void> resetVideo() async {
     if (videoPlayerController.isDisposedOrNotInitialized) return;
-
     if (isVideoResetInProgress) return;
 
     isVideoResetInProgress = true;
