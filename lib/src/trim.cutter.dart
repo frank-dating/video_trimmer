@@ -83,27 +83,34 @@ class TrimCutter extends StatefulWidget {
 class _TrimCutterState extends State<TrimCutter> {
   bool isLeftClinged = true;
   bool isRightClinged = true;
+
+  double lastLeftPos = 0.0;
+  double lastRightPos = 0.0;
+
+  bool isFirstBuild = true;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isFirstBuild = false;
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var rightPos = widget.width - widget.endPos.dx;
     var leftPos = widget.startPos.dx;
 
-    if (!isLeftClinged && leftPos < 2) {
-      leftPos = 0.0;
-      widget.onClingLeft?.call();
-    } else {
-      isLeftClinged = false;
-    }
+    setClingListeners(leftPos, rightPos);
 
-    if (!isRightClinged && rightPos < 2) {
-      rightPos = 0.0;
-      widget.onClingRight?.call();
-      isRightClinged = true;
-    } else {
-      isRightClinged = false;
-    }
+    print('reight pos: $rightPos : $lastRightPos : ${widget.width}');
 
-    final isFullWidth = leftPos == 0 && rightPos == 0;
+    lastLeftPos = leftPos;
+    lastRightPos = rightPos;
+
+    final isFullWidth = isFirstBuild || leftPos == 0 && rightPos == 0;
     return Container(
       height: double.infinity,
       margin: EdgeInsets.only(
@@ -158,5 +165,17 @@ class _TrimCutterState extends State<TrimCutter> {
         ],
       ),
     );
+  }
+
+  void setClingListeners(double leftPos, double rightPos) {
+    if (isFirstBuild) return;
+
+    if (leftPos == 0.0 && leftPos != lastLeftPos) {
+      widget.onClingLeft?.call();
+    }
+
+    if (rightPos == 0.0 && rightPos != lastRightPos && lastRightPos != widget.width) {
+      widget.onClingRight?.call();
+    }
   }
 }

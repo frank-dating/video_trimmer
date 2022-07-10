@@ -87,6 +87,8 @@ class _TrimmerViewState extends State<TrimmerView> {
                       onChangeEnd: (value) {
                         _endValue = value;
                       },
+                      onClingLeft: () => print('clinged left'),
+                      onClingRight: () => print('clinged right'),
                     ),
                   ),
                   TextButton(

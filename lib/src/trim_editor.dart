@@ -99,6 +99,8 @@ class TrimEditor extends StatefulWidget {
   final VoidCallback? onClingLeft;
   final VoidCallback? onClingRight;
 
+  final int clingOffset;
+
   /// Widget for displaying the video trimmer.
   ///
   /// This has frame wise preview of the video with a
@@ -184,6 +186,7 @@ class TrimEditor extends StatefulWidget {
     required this.previewWrapper,
     this.onClingLeft,
     this.onClingRight,
+    this.clingOffset = 1,
   }) : super(key: key);
 
   @override
@@ -379,7 +382,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
           (_startPos.dx + details.delta.dx <= _endPos.dx) &&
           (_endPos.dx - _startPos.dx - details.delta.dx >= _minCropWidth) &&
           !(_endPos.dx - _startPos.dx - details.delta.dx > maxLengthPixels!)) {
-        _startPos += details.delta;
+        _updateStartPos(details);
         _onStartDragged();
       }
     } else if (_dragType == EditorDragType.center) {
@@ -395,13 +398,33 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
           (_endPos.dx + details.delta.dx >= _startPos.dx) &&
           (_endPos.dx - _startPos.dx + details.delta.dx >= _minCropWidth) &&
           !(_endPos.dx - _startPos.dx + details.delta.dx > maxLengthPixels!)) {
-        _endPos += details.delta;
+        _updateEndPos(details);
         _onEndDragged();
       }
     }
 
     if (!mounted) return;
     setState(() {});
+  }
+
+  void _updateStartPos(DragUpdateDetails details) {
+    if (_startPos.dx + details.delta.dx < widget.clingOffset) {
+      _startPos = Offset.zero;
+    } else {
+      _startPos += details.delta;
+    }
+  }
+
+  void _updateEndPos(DragUpdateDetails details) {
+    if (_thumbnailViewerW - (_endPos.dx + details.delta.dx) <
+        widget.clingOffset) {
+      _endPos = Offset(
+        maxLengthPixels != null ? maxLengthPixels! : _thumbnailViewerW,
+        _thumbnailViewerH,
+      );
+    } else {
+      _endPos += details.delta;
+    }
   }
 
   void _onStartDragged() {
