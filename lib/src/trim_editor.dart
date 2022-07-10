@@ -410,7 +410,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     if (_startPos.dx + details.delta.dx < widget.clingOffset) {
       final gap = _startPos - Offset.zero;
       _startPos = Offset.zero;
-      _endPos += gap;
+      _endPos -= gap;
     } else {
       if (_thumbnailViewerW - (_endPos.dx + details.delta.dx) <
           widget.clingOffset) {

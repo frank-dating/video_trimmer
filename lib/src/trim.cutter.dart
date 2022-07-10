@@ -100,8 +100,8 @@ class _TrimCutterState extends State<TrimCutter> {
 
   @override
   Widget build(BuildContext context) {
-    var rightPos = widget.width - widget.endPos.dx;
-    var leftPos = widget.startPos.dx;
+    var rightPos = (widget.width - widget.endPos.dx).clamp(.0, double.infinity);
+    var leftPos = widget.startPos.dx.clamp(.0, double.infinity);
 
     setClingListeners(leftPos, rightPos);
 
@@ -111,10 +111,7 @@ class _TrimCutterState extends State<TrimCutter> {
     final isFullWidth = isFirstBuild || leftPos == 0 && rightPos == 0;
     return Container(
       height: double.infinity,
-      margin: EdgeInsets.only(
-        left: widget.startPos.dx,
-        right: widget.width - widget.endPos.dx,
-      ),
+      margin: EdgeInsets.only(left: leftPos, right: rightPos),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -172,7 +169,9 @@ class _TrimCutterState extends State<TrimCutter> {
       widget.onClingLeft?.call();
     }
 
-    if (rightPos == 0.0 && rightPos != lastRightPos && lastRightPos != widget.width) {
+    if (rightPos == 0.0 &&
+        rightPos != lastRightPos &&
+        lastRightPos != widget.width) {
       widget.onClingRight?.call();
     }
   }
