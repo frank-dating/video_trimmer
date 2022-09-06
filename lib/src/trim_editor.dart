@@ -238,6 +238,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   /// of the frame, to make the UI more realistic.
   bool _allowDrag = true;
 
+  bool _isVideoTooSmall = false;
+
   @override
   void initState() {
     super.initState();
@@ -252,6 +254,9 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
         _minCropWidth = (widget.viewerWidth / maxVideoLength.inMilliseconds) *
             widget.minVideoLength.inMilliseconds;
+
+        _isVideoTooSmall = widget.minVideoLength.inMilliseconds >
+            videoPlayerController.value.duration.inMilliseconds;
 
         _initializeVideoController();
 
@@ -525,6 +530,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
               scrubberPaintColor: widget.scrubberPaintColor,
               onClingLeft: widget.onClingLeft,
               onClingRight: widget.onClingRight,
+              isArrowsVisible: !_isVideoTooSmall,
             ),
           ],
         ),

@@ -54,6 +54,7 @@ class TrimCutter extends StatefulWidget {
     required this.borderPaintColor,
     required this.onClingLeft,
     required this.onClingRight,
+    required this.isArrowsVisible,
   }) : super(key: key);
 
   /// To define the start offset
@@ -75,6 +76,8 @@ class TrimCutter extends StatefulWidget {
 
   final VoidCallback? onClingLeft;
   final VoidCallback? onClingRight;
+
+  final bool isArrowsVisible;
 
   @override
   State<TrimCutter> createState() => _TrimCutterState();
@@ -134,7 +137,7 @@ class _TrimCutterState extends State<TrimCutter> {
               ),
             ),
           ),
-          Positioned(
+          if(widget.isArrowsVisible) Positioned(
             right: 5,
             child: RotatedBox(
               quarterTurns: 2,
@@ -147,7 +150,7 @@ class _TrimCutterState extends State<TrimCutter> {
               ),
             ),
           ),
-          Positioned(
+          if(widget.isArrowsVisible) Positioned(
             left: 5,
             child: Image.asset(
               'assets/crop-arrow.png',
