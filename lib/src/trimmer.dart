@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter_full/return_code.dart';
 import 'package:path/path.dart';
 
 import 'package:flutter/material.dart';
@@ -252,24 +249,6 @@ class Trimmer {
     _outputPath = '$path$videoFileName$_outputFormatString';
 
     _command += '"$_outputPath"';
-
-    FFmpegKit.executeAsync(_command, (session) async {
-      final state =
-          FFmpegKitConfig.sessionStateToString(await session.getState());
-      final returnCode = await session.getReturnCode();
-
-      debugPrint("FFmpeg process exited with state $state and rc $returnCode");
-
-      if (ReturnCode.isSuccess(returnCode)) {
-        debugPrint("FFmpeg processing completed successfully.");
-        debugPrint('Video successfuly saved');
-        onSave(_outputPath);
-      } else {
-        debugPrint("FFmpeg processing failed.");
-        debugPrint('Couldn\'t save the video');
-        onSave(null);
-      }
-    });
 
     // return _outputPath;
   }
